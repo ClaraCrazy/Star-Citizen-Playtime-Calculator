@@ -40,6 +40,7 @@ def convert_to_datetime(s):
 
 def get_totals(path):
     total_deltas = timedelta()
+    first = ""
     for file in get_files(path):
         try:
             fhandle = open(file,'r')
@@ -47,19 +48,24 @@ def get_totals(path):
             pass
         text_content = fhandle.read().split("\n")
         dates = extract_dates(text_content)
+        if not bool(first):
+            try:
+                first = convert_to_datetime(dates[0])
+            except:
+                continue
         if len(dates) > 0:
             total_deltas += convert_to_datetime(dates[-1])-convert_to_datetime(dates[0])
     totsec = total_deltas.total_seconds()
 
     h = totsec//3600
     m = (totsec%3600) // 60
-    sec =(totsec%3600) % 60
+    sec = (totsec%3600) % 60
     total_deltas = f"{pink}{int(h)}{white}hour{'s' if not int(h) == 1 else ''}, {pink}{int(m)}{white}minute{'s' if not int(m) == 1 else ''} and {pink}{int(sec)}{white}second{'s' if not int(sec) == 1 else ''}"
-    return total_deltas
+    return first, total_deltas
 
 def just_do_it(path):
     totals = get_totals(path)
-    print(f"\n{white}Congrats, Soldier. You have served for " + totals)
+    print(f"\n{white}Congrats, Soldier. You started serving the 'verse at {pink}{totals[0]}{white} and have so far served for " + totals[1])
 
 def main():
     os.system("cls")
@@ -67,8 +73,8 @@ def main():
     print("Please select your Install folder for StarCitizen (RSI/StarCitizen/Live)")
     path = diropenbox("Please Select your RSI Install folder here", "Select RSI Folder", 'C:\\')
     path = f"{path}\logbackups"
-    print(path)
-    input()
+#    path = "D:\RSI\StarCitizen\LIVE\logbackups"
+    os.system("cls")
     just_do_it(path)
 
 if __name__ == '__main__':
